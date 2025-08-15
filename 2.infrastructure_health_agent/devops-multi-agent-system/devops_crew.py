@@ -14,8 +14,32 @@ class DevOpsAgentCrew:
     """
   
     def __init__(self):
-        self.llm = ChatOpenAI(model="gpt-4", temperature=0.1)
-    
+        import os
+
+        # Get API key from environment
+        api_key = os.getenv('OPENROUTER_API_KEY') or os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("Either OPENROUTER_API_KEY or OPENAI_API_KEY must be set")
+
+        # Configure for OpenRouter if using OPENROUTER_API_KEY
+        if os.getenv('OPENROUTER_API_KEY'):
+            self.llm = ChatOpenAI(
+                model="openai/gpt-4.1-nano",  # High-quality model via OpenRouter
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1",
+                temperature=0.1,
+                default_headers={
+                    "HTTP-Referer": "https://github.com/your-repo/infrastructure-agent",
+                    "X-Title": "Infrastructure Health Agent"
+                }
+            )
+        else:
+            # Fallback to direct OpenAI
+            self.llm = ChatOpenAI(
+                model="gpt-4",
+                api_key=api_key,
+                temperature=0.1
+            )
         # Create specialized agents
         self.infrastructure_agent = self._create_infrastructure_agent()
         self.security_agent = self._create_security_agent()
@@ -81,7 +105,27 @@ class DevOpsAgentCrew:
             tools=self._get_deployment_tools()
         )
 
-    def _create_crew(self) -> Crew:
+    def _get_infrastructure_tools(self) -> List[BaseTool]:
+        """Get tools for infrastructure management"""
+        # For now, return empty list - tools will be added later
+        return []
+    
+    def _get_security_tools(self) -> List[BaseTool]:
+        """Get tools for security analysis"""
+        # For now, return empty list - tools will be added later
+        return []
+    
+    def _get_monitoring_tools(self) -> List[BaseTool]:
+        """Get tools for monitoring and observability"""
+        # For now, return empty list - tools will be added later
+        return []
+    
+    def _get_deployment_tools(self) -> List[BaseTool]:
+        """Get tools for deployment and CI/CD"""
+        # For now, return empty list - tools will be added later
+        return []
+
+    def _create_crew(self, tasks: List[Task] = None) -> Crew:
         """Create the crew with task delegation capabilities"""
         return Crew(
             agents=[
@@ -90,6 +134,7 @@ class DevOpsAgentCrew:
                 self.monitoring_agent,
                 self.deployment_agent
             ],
+            tasks=tasks or [],
             process=Process.hierarchical,  # Infrastructure agent leads
             manager_llm=self.llm,
             verbose=True
@@ -159,8 +204,11 @@ class DevOpsAgentCrew:
             )
         ]
 
+        # Create a crew specifically for this incident
+        incident_crew = self._create_crew(tasks)
+        
         # Execute the incident response
-        result = self.crew.kickoff(tasks=tasks)
+        result = incident_crew.kickoff()
         return result
 
     def infrastructure_optimization(self, requirements: str) -> str:
@@ -182,7 +230,10 @@ class DevOpsAgentCrew:
             expected_output="Comprehensive infrastructure optimization plan"
         )
 
-        result = self.crew.kickoff(tasks=[optimization_task])
+        # Create a crew specifically for this optimization
+        optimization_crew = self._create_crew([optimization_task])
+        
+        result = optimization_crew.kickoff()
         return result
 
 

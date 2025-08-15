@@ -30,16 +30,29 @@ Choose one of the following:
 
 ## Quick Start
 
-Want to test immediately? Run one of these commands:
+### **Single Agent System** (Original)
 ```bash
 # Basic setup test
 source venv/bin/activate && python test_setup.py
 
-# Test individual monitoring tools (no OpenAI API required)
+# Test individual monitoring tools (no API key required)
 source venv/bin/activate && python test_tools.py
 
-# Or built-in test
+# Built-in test
 source venv/bin/activate && python infrastructure_agent.py --test
+```
+
+### **🚀 Multi-Agent System** (New - CrewAI)
+```bash
+# Setup multi-agent system (uses existing venv)
+source venv/bin/activate
+cd devops-multi-agent-system && ./setup.sh
+
+# Test the multi-agent crew
+python test_multi_agent.py
+
+# Run live demo with scenarios
+python demo.py
 ```
 
 ## Installation
@@ -310,6 +323,36 @@ The agent uses these default thresholds:
 | Disk Usage | >90% | >98% |
 
 Modify thresholds in the `_create_health_check_tool()` method.
+
+## 🚀 Multi-Agent System (CrewAI)
+
+In addition to the single-agent system, we now have a **comprehensive multi-agent DevOps system** built with CrewAI:
+
+### **Agent Specializations:**
+- 🏗️ **Infrastructure Specialist**: Cloud platforms, scaling, cost optimization
+- 🔒 **Security Specialist**: DevSecOps, compliance, threat modeling
+- 📊 **Monitoring Specialist**: SRE, observability, alerting, metrics  
+- 🚀 **Deployment Specialist**: CI/CD, releases, pipeline management
+
+### **Key Features:**
+- ✅ **Agent Collaboration**: Intelligent task delegation and coordination
+- ✅ **Multiple Workflows**: Sequential, parallel, and conditional execution
+- ✅ **Production APIs**: FastAPI server with monitoring
+- ✅ **Enterprise Security**: RBAC, input validation, secure configs
+- ✅ **Performance Optimization**: Redis caching, parallel execution
+
+### **Quick Setup:**
+```bash
+# From the root project directory
+source venv/bin/activate
+cd devops-multi-agent-system
+./setup.sh                       # Automated setup (uses parent venv)
+python verify_setup.py           # Verify parent venv integration
+python test_basic_structure.py   # Test system structure
+python test_multi_agent.py       # Comprehensive testing (requires API key)
+```
+
+**📖 Full Documentation**: See `devops-multi-agent-system/README.md` for complete setup and usage instructions.
 
 ## Security Considerations
 
