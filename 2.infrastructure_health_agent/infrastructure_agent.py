@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from typing import List, Dict, Any
 
-from langchain.agents import create_openai_functions_agent, AgentExecutor
+from langchain.agents import create_openai_tools_agent, AgentExecutor
 from langchain.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage
@@ -31,7 +31,7 @@ class InfrastructureHealthAgent:
         # Configure for OpenRouter if using OPENROUTER_API_KEY
         if os.getenv('OPENROUTER_API_KEY'):
             self.llm = ChatOpenAI(
-                model="openai/gpt-oss-20b:free",  # High-quality model via OpenRouter
+                model="openai/gpt-4.1-nano",  # High-quality model via OpenRouter
                 api_key=api_key,
                 base_url="https://openrouter.ai/api/v1",
                 temperature=0.1,
@@ -99,7 +99,7 @@ You have access to tools for:
             MessagesPlaceholder(variable_name="agent_scratchpad")
         ])
     
-        return create_openai_functions_agent(self.llm, self.tools, prompt)
+        return create_openai_tools_agent(self.llm, self.tools, prompt)
 
     def _create_tools(self) -> List[BaseTool]:
         """Create the tools that the agent can use"""
